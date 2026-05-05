@@ -47,7 +47,7 @@ export const getRandomMeal = async () => {
 }
 
 export const ingredientImage = (name) =>
-  `https://www.themealdb.com/images/ingredients/${encodeURIComponent(name)}-Small.png`
+  `https://www.themealdb.com/images/ingredients/${encodeURIComponent(name)}.png`
 
 export const mealImage = (thumb, size = 'medium') =>
   thumb ? `${thumb}/${size}` : null

@@ -26,7 +26,7 @@ const MealModal = ({ meal, onClose }) => {
         width: '100%', maxHeight: '90vh', overflowY: 'auto', padding: '0'
       }} onClick={e => e.stopPropagation()}>
         {meal.strMealThumb && (
-          <img src={`${meal.strMealThumb}/medium`} alt={meal.strMeal}
+          <img src={meal.strMealThumb} alt={meal.strMeal}
             style={{ width: '100%', height: '260px', objectFit: 'cover', borderRadius: '16px 16px 0 0' }} />
         )}
         <div style={{ padding: '24px' }}>
@@ -68,7 +68,7 @@ const MealModal = ({ meal, onClose }) => {
 const MealCard = ({ meal, onClick }) => (
   <div className="recipe-card" style={{ cursor: 'pointer', padding: '0', overflow: 'hidden' }} onClick={() => onClick(meal)}>
     {meal.strMealThumb && (
-      <img src={`${meal.strMealThumb}/small`} alt={meal.strMeal}
+      <img src={meal.strMealThumb} alt={meal.strMeal}
         style={{ width: '100%', height: '160px', objectFit: 'cover' }} />
     )}
     <div style={{ padding: '14px' }}>

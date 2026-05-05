@@ -8,7 +8,7 @@ import api from '../services/api'
 const MealCard = ({ meal, onExpand }) => (
   <div className="mealdb-card" onClick={() => onExpand(meal)}>
     {meal.strMealThumb && (
-      <img src={`${meal.strMealThumb}/small`} alt={meal.strMeal} className="mealdb-card-img" />
+      <img src={meal.strMealThumb} alt={meal.strMeal} className="mealdb-card-img" />
     )}
     <div className="mealdb-card-body">
       <h4>{meal.strMeal}</h4>
@@ -29,7 +29,7 @@ const MealModal = ({ meal, onClose }) => {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={e => e.stopPropagation()}>
         {meal.strMealThumb && (
-          <img src={`${meal.strMealThumb}/medium`} alt={meal.strMeal} className="modal-img" />
+          <img src={meal.strMealThumb} alt={meal.strMeal} className="modal-img" />
         )}
         <div className="modal-body">
           <div className="modal-header">
@@ -224,13 +224,11 @@ const AIsuggestions = () => {
   return (
     <div className="page-container">
 
-      {/* ── Header ── */}
       <div className="page-header">
         <h1>What's Cooking?</h1>
         <p>Tell us what you have and we'll find delicious recipes for you.</p>
       </div>
 
-      {/* ── Input Card ── */}
       <div className="suggest-input-card">
         <div className="suggest-tabs">
           <button
@@ -275,7 +273,6 @@ const AIsuggestions = () => {
         </button>
       </div>
 
-      {/* ── Error ── */}
       {error && (
         <div className="alert alert-error" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <span style={{ fontSize: '18px', flexShrink: 0 }}>🚫</span>
@@ -283,7 +280,6 @@ const AIsuggestions = () => {
         </div>
       )}
 
-      {/* ── Loading ── */}
       {loading && (
         <div className="suggest-loading">
           <div className="suggest-loading-animation">
@@ -294,7 +290,6 @@ const AIsuggestions = () => {
         </div>
       )}
 
-      {/* ── Empty state (before first search) ── */}
       {!loading && !hasResults && !error && (
         <div className="suggest-empty">
           <span className="suggest-empty-icon">👨‍🍳</span>
@@ -303,7 +298,6 @@ const AIsuggestions = () => {
         </div>
       )}
 
-      {/* ── AI Results ── */}
       {suggestions && !loading && (() => {
         const result = parseRecipes(suggestions)
         if (result?.error) return (
@@ -333,7 +327,6 @@ const AIsuggestions = () => {
         )
       })()}
 
-      {/* ── MealDB Results ── */}
       {(mealdbResults.length > 0 || mealdbLoading) && (
         <div className="suggest-mealdb">
           <div className="suggest-results-header">

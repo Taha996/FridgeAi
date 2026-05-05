@@ -7,52 +7,63 @@ const Home = () => {
   return (
     <div className="home-page">
       <section className="hero-section">
-        <h1>Your Smart <span>FridgeAI</span></h1>
-        <p>Turn whatever's in your fridge into amazing recipes. AI-powered suggestions tailored to your allergies and taste.</p>
+        <span className="hero-emoji">🥘</span>
+        <h1>Cook something<br />amazing <span>tonight</span></h1>
+        <p>
+          FridgeAI looks at what's in your kitchen and suggests
+          delicious recipes you can actually make. No food waste, no stress.
+        </p>
         <div className="hero-actions">
           {token ? (
             <>
-              <Link to="/ai" className="btn btn-accent btn-lg">✨ Get AI Suggestions</Link>
-              <Link to="/pantry" className="btn btn-lg" style={{ background: 'rgba(255,255,255,0.15)', color: 'white', border: '1.5px solid rgba(255,255,255,0.4)' }}>
-                My Pantry
-              </Link>
+              <Link to="/ai" className="btn btn-accent btn-lg">🍳 Get Recipe Ideas</Link>
+              <Link to="/pantry" className="hero-btn-ghost">🧊 My Pantry</Link>
             </>
           ) : (
             <>
-              <Link to="/register" className="btn btn-accent btn-lg">Get Started Free</Link>
-              <Link to="/login" className="btn btn-lg" style={{ background: 'rgba(255,255,255,0.15)', color: 'white', border: '1.5px solid rgba(255,255,255,0.4)' }}>
-                Sign In
-              </Link>
+              <Link to="/register" className="btn btn-accent btn-lg">Get Started — it's free</Link>
+              <Link to="/login" className="hero-btn-ghost">I have an account</Link>
             </>
           )}
         </div>
       </section>
 
       <section className="features-section">
-        <h2>Everything you need in your kitchen</h2>
+        <h2>Your kitchen, simplified</h2>
+        <p className="features-subtitle">
+          Everything you need to plan meals, reduce waste, and eat well.
+        </p>
         <div className="features-grid">
           <div className="feature-card">
-            <div className="feature-icon">🧠</div>
-            <h3>AI Recipe Suggestions</h3>
-            <p>Grok AI analyzes your pantry and suggests personalized recipes in seconds.</p>
+            <span className="feature-icon">🧠</span>
+            <h3>AI Recipe Ideas</h3>
+            <p>Tell us your ingredients and our AI creates personalized recipes in seconds.</p>
           </div>
           <div className="feature-card">
-            <div className="feature-icon">🥦</div>
+            <span className="feature-icon">🧊</span>
             <h3>Pantry Tracker</h3>
-            <p>Keep track of what's in your fridge with quantities and expiry dates.</p>
+            <p>Keep track of what's in your fridge with quantities and expiry alerts.</p>
           </div>
           <div className="feature-card">
-            <div className="feature-icon">📋</div>
-            <h3>Recipe Manager</h3>
-            <p>Save your favourite recipes and generate shopping lists automatically.</p>
+            <span className="feature-icon">📖</span>
+            <h3>Save Recipes</h3>
+            <p>Build your personal cookbook. Save AI suggestions or add your own.</p>
           </div>
           <div className="feature-card">
-            <div className="feature-icon">🚫</div>
+            <span className="feature-icon">🛡️</span>
             <h3>Allergy Safe</h3>
-            <p>Set your allergies and dietary preferences — the AI always respects them.</p>
+            <p>Set your allergies and dietary needs — every suggestion respects them.</p>
           </div>
         </div>
       </section>
+
+      {!token && (
+        <section className="home-cta-section">
+          <h2>Ready to stop wasting food?</h2>
+          <p>Join FridgeAI and start cooking smarter today.</p>
+          <Link to="/register" className="btn btn-accent btn-lg">Create Free Account</Link>
+        </section>
+      )}
     </div>
   )
 }
