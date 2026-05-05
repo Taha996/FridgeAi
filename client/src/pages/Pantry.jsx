@@ -3,6 +3,7 @@ import api from '../services/api'
 import { getIngredients, ingredientImage } from '../services/mealdbService'
 
 const CATEGORIES = ['dairy', 'meat', 'vegetables', 'fruits', 'grains', 'spices', 'drinks', 'other']
+const UNITS = ['pcs', 'g', 'kg', 'l']
 
 const Pantry = () => {
   const [items, setItems] = useState([])
@@ -155,9 +156,12 @@ const Pantry = () => {
               </div>
               <div className="form-group">
                 <label>Unit</label>
-                <input className="form-control" value={form.unit}
-                  onChange={e => setForm(p => ({ ...p, unit: e.target.value }))}
-                  placeholder="pcs, kg, ml..." />
+                <select className="form-control" value={form.unit}
+                  onChange={e => setForm(p => ({ ...p, unit: e.target.value }))}>
+                  {UNITS.map(u => (
+                    <option key={u} value={u}>{u}</option>
+                  ))}
+                </select>
               </div>
             </div>
             <div className="form-group">

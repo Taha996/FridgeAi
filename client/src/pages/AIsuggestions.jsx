@@ -1,19 +1,18 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getSuggestionsFromPantry, getSuggestionsFromIngredients } from '../services/aiService'
+import { createRecipe } from '../services/recipeService'
 import { getMealsByIngredient, getMealById } from '../services/mealdbService'
 import api from '../services/api'
 
 const MealCard = ({ meal, onExpand }) => (
-  <div className="recipe-card" style={{ cursor: 'pointer', padding: '0', overflow: 'hidden' }}
-    onClick={() => onExpand(meal)}>
+  <div className="mealdb-card" onClick={() => onExpand(meal)}>
     {meal.strMealThumb && (
-      <img src={`${meal.strMealThumb}/small`} alt={meal.strMeal}
-        style={{ width: '100%', height: '140px', objectFit: 'cover' }} />
+      <img src={`${meal.strMealThumb}/small`} alt={meal.strMeal} className="mealdb-card-img" />
     )}
-    <div style={{ padding: '12px' }}>
-      <h3 style={{ fontSize: '14px', marginBottom: '4px' }}>{meal.strMeal}</h3>
-      {meal.strCategory && <span className="badge badge-green" style={{ fontSize: '11px' }}>{meal.strCategory}</span>}
+    <div className="mealdb-card-body">
+      <h4>{meal.strMeal}</h4>
+      {meal.strCategory && <span className="badge badge-green">{meal.strCategory}</span>}
     </div>
   </div>
 )
@@ -27,33 +26,128 @@ const MealModal = ({ meal, onClose }) => {
   }
 
   return (
-    <div style={{
-      position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      zIndex: 200, padding: '16px'
-    }} onClick={onClose}>
-      <div style={{
-        background: 'white', borderRadius: '16px', maxWidth: '640px',
-        width: '100%', maxHeight: '90vh', overflowY: 'auto'
-      }} onClick={e => e.stopPropagation()}>
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={e => e.stopPropagation()}>
         {meal.strMealThumb && (
-          <img src={`${meal.strMealThumb}/medium`} alt={meal.strMeal}
-            style={{ width: '100%', height: '240px', objectFit: 'cover', borderRadius: '16px 16px 0 0' }} />
+          <img src={`${meal.strMealThumb}/medium`} alt={meal.strMeal} className="modal-img" />
         )}
-        <div style={{ padding: '24px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-            <h2 style={{ color: 'var(--primary-dark)', fontSize: '20px', fontWeight: 700, flex: 1 }}>{meal.strMeal}</h2>
-            <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '22px', cursor: 'pointer', color: 'var(--text-muted)', marginLeft: '12px' }}>×</button>
+        <div className="modal-body">
+          <div className="modal-header">
+            <h2>{meal.strMeal}</h2>
+            <button onClick={onClose} className="modal-close">&times;</button>
           </div>
-          <h3 style={{ color: 'var(--primary-dark)', marginBottom: '8px', fontSize: '15px' }}>Ingredients</h3>
-          <ul style={{ paddingLeft: '18px', color: 'var(--text-muted)', marginBottom: '16px', lineHeight: 2 }}>
-            {ingredients.map((ing, i) => <li key={i}>{ing}</li>)}
-          </ul>
-          <h3 style={{ color: 'var(--primary-dark)', marginBottom: '8px', fontSize: '15px' }}>Instructions</h3>
-          <p style={{ color: 'var(--text)', lineHeight: 1.8, whiteSpace: 'pre-wrap', fontSize: '14px' }}>
-            {meal.strInstructions}
-          </p>
+          <div className="modal-section">
+            <h3>Ingredients</h3>
+            <ul className="modal-ingredients">
+              {ingredients.map((ing, i) => <li key={i}>{ing}</li>)}
+            </ul>
+          </div>
+          <div className="modal-section">
+            <h3>Instructions</h3>
+            <p className="modal-instructions">{meal.strInstructions}</p>
+          </div>
         </div>
+      </div>
+    </div>
+  )
+}
+
+const INGREDIENT_PATTERN = /^[a-zA-Z][a-zA-Z\s\-']{1,40}$/
+
+const validateIngredients = (items) => {
+  const invalid = items.filter(item => !INGREDIENT_PATTERN.test(item))
+  if (invalid.length > 0) return `These don't look like ingredients: ${invalid.join(', ')}`
+  return null
+}
+
+const parseRecipes = (raw) => {
+  try {
+    const cleaned = raw.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim()
+    const parsed = JSON.parse(cleaned)
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      if (parsed[0].error) return { error: parsed[0].error }
+      if (parsed[0].name) return { recipes: parsed }
+    }
+  } catch {}
+  return null
+}
+
+const RecipeCard = ({ recipe }) => {
+  const [saveState, setSaveState] = useState('idle')
+
+  const handleSave = async () => {
+    setSaveState('saving')
+    try {
+      const timeNum = parseInt(recipe.time) || undefined
+      const servingsNum = parseInt(recipe.servings) || undefined
+      await createRecipe({
+        title: recipe.name,
+        ingredients: recipe.ingredients.map(ing => ing.name),
+        instructions: recipe.steps.map((s, i) => `${i + 1}. ${s}`).join('\n'),
+        cookingTime: timeNum,
+        servings: servingsNum,
+        tags: ['ai-generated']
+      })
+      setSaveState('saved')
+    } catch {
+      setSaveState('error')
+      setTimeout(() => setSaveState('idle'), 2000)
+    }
+  }
+
+  return (
+    <div className="ai-card">
+      <div className="ai-card-top">
+        <div className="ai-card-title">
+          <span className="ai-card-emoji">🍽️</span>
+          <h3>{recipe.name}</h3>
+        </div>
+        <div className="ai-card-badges">
+          <span className="ai-badge"><span className="ai-badge-icon">⏱️</span> {recipe.time}</span>
+          <span className="ai-badge"><span className="ai-badge-icon">👥</span> {recipe.servings} servings</span>
+        </div>
+      </div>
+
+      <div className="ai-card-section">
+        <h4 className="ai-card-label">What you'll need</h4>
+        <ul className="ai-card-ingredients">
+          {recipe.ingredients.map((ing, i) => (
+            <li key={i} className={ing.hasIngredient ? 'owned' : ''}>
+              <span className="ing-icon">{ing.hasIngredient ? '✓' : '+'}</span>
+              {ing.name}
+            </li>
+          ))}
+        </ul>
+        <div className="ai-card-legend">
+          <span className="legend-item"><span className="legend-dot owned" /> You have this</span>
+          <span className="legend-item"><span className="legend-dot" /> You'll need this</span>
+        </div>
+      </div>
+
+      <div className="ai-card-section">
+        <h4 className="ai-card-label">How to make it</h4>
+        <ol className="ai-card-steps">
+          {recipe.steps.map((step, i) => (
+            <li key={i}>
+              <span className="step-num">{i + 1}</span>
+              <span>{step}</span>
+            </li>
+          ))}
+        </ol>
+      </div>
+
+      <div className="ai-card-footer">
+        {saveState === 'saved' ? (
+          <span className="ai-saved-pill">✓ Saved to My Recipes</span>
+        ) : (
+          <button
+            className="btn btn-primary btn-sm"
+            onClick={handleSave}
+            disabled={saveState === 'saving'}
+          >
+            {saveState === 'saving' ? 'Saving...' : saveState === 'error' ? 'Failed — Retry' : '💾 Save Recipe'}
+          </button>
+        )}
       </div>
     </div>
   )
@@ -91,6 +185,12 @@ const AIsuggestions = () => {
           setLoading(false)
           return
         }
+        const validationError = validateIngredients(ingredients)
+        if (validationError) {
+          setError(validationError + '. Please enter only real food ingredients (e.g. eggs, rice, chicken).')
+          setLoading(false)
+          return
+        }
         res = await getSuggestionsFromIngredients(ingredients)
         ingredientsForMealDB = ingredients.slice(0, 3)
       }
@@ -107,7 +207,7 @@ const AIsuggestions = () => {
         setMealdbLoading(false)
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to get suggestions. Check your API key.')
+      setError(err.response?.data?.message || 'Something went wrong. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -119,68 +219,127 @@ const AIsuggestions = () => {
     if (full) setSelectedMeal(full)
   }
 
+  const hasResults = suggestions || mealdbResults.length > 0
+
   return (
     <div className="page-container">
+
+      {/* ── Header ── */}
       <div className="page-header">
-        <h1>AI Recipe Suggestions</h1>
-        <p>Get personalized recipes from AI + real meal examples from TheMealDB</p>
+        <h1>What's Cooking?</h1>
+        <p>Tell us what you have and we'll find delicious recipes for you.</p>
       </div>
 
-      <div className="card" style={{ marginBottom: '24px' }}>
-        <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
-          <button className={`btn ${mode === 'pantry' ? 'btn-primary' : 'btn-secondary'}`}
-            onClick={() => setMode('pantry')}>
-            Use My Pantry
+      {/* ── Input Card ── */}
+      <div className="suggest-input-card">
+        <div className="suggest-tabs">
+          <button
+            className={`suggest-tab ${mode === 'pantry' ? 'active' : ''}`}
+            onClick={() => setMode('pantry')}
+          >
+            🧊 From My Pantry
           </button>
-          <button className={`btn ${mode === 'custom' ? 'btn-primary' : 'btn-secondary'}`}
-            onClick={() => setMode('custom')}>
-            Enter Ingredients
+          <button
+            className={`suggest-tab ${mode === 'custom' ? 'active' : ''}`}
+            onClick={() => setMode('custom')}
+          >
+            ✏️ Type Ingredients
           </button>
         </div>
 
-        {mode === 'pantry' && (
-          <p style={{ color: 'var(--text-muted)', marginBottom: '16px', fontSize: '14px' }}>
-            Uses all items in your <Link to="/pantry" style={{ color: 'var(--primary)' }}>pantry</Link>. Make sure you have added ingredients there first.
-          </p>
-        )}
+        <div className="suggest-tab-content">
+          {mode === 'pantry' ? (
+            <p className="suggest-hint">
+              We'll use everything in your{' '}
+              <Link to="/pantry" className="suggest-link">pantry</Link>{' '}
+              to find recipes that match. The more items you have, the better the results!
+            </p>
+          ) : (
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <label>What ingredients do you have?</label>
+              <input
+                className="form-control"
+                value={customIngredients}
+                onChange={e => setCustomIngredients(e.target.value)}
+                placeholder="e.g. chicken, rice, garlic, soy sauce..."
+              />
+              <p className="suggest-hint" style={{ marginTop: '6px' }}>
+                Separate each ingredient with a comma.
+              </p>
+            </div>
+          )}
+        </div>
 
-        {mode === 'custom' && (
-          <div className="form-group">
-            <label>Your Ingredients (comma separated)</label>
-            <input className="form-control" value={customIngredients}
-              onChange={e => setCustomIngredients(e.target.value)}
-              placeholder="eggs, cheese, tomatoes, pasta..." />
-          </div>
-        )}
-
-        <button className="btn btn-accent btn-lg" onClick={handleSuggest} disabled={loading}>
-          {loading ? '✨ Generating...' : '✨ Suggest Recipes'}
+        <button className="btn btn-accent btn-lg btn-block" onClick={handleSuggest} disabled={loading}>
+          {loading ? '🍳 Finding Recipes...' : '🍳 Find Recipes'}
         </button>
       </div>
 
-      {error && <div className="alert alert-error">{error}</div>}
+      {/* ── Error ── */}
+      {error && (
+        <div className="alert alert-error" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <span style={{ fontSize: '18px', flexShrink: 0 }}>🚫</span>
+          <span>{error}</span>
+        </div>
+      )}
 
+      {/* ── Loading ── */}
       {loading && (
-        <div className="loading" style={{ flexDirection: 'column', gap: '8px' }}>
-          <span style={{ fontSize: '36px' }}>🤖</span>
-          <span>AI is thinking up recipes for you...</span>
+        <div className="suggest-loading">
+          <div className="suggest-loading-animation">
+            <span>🥘</span><span>🍳</span><span>🥗</span>
+          </div>
+          <p className="suggest-loading-text">Finding the best recipes for you...</p>
+          <p className="suggest-loading-sub">This usually takes a few seconds.</p>
         </div>
       )}
 
-      {suggestions && !loading && (
-        <div style={{ marginBottom: '32px' }}>
-          <h3 style={{ marginBottom: '12px', color: 'var(--primary-dark)' }}>
-            🤖 AI Suggestions
-          </h3>
-          <div className="ai-response">{suggestions}</div>
+      {/* ── Empty state (before first search) ── */}
+      {!loading && !hasResults && !error && (
+        <div className="suggest-empty">
+          <span className="suggest-empty-icon">👨‍🍳</span>
+          <h3>Ready when you are</h3>
+          <p>Pick your ingredients and hit <strong>Find Recipes</strong> to get started.</p>
         </div>
       )}
 
+      {/* ── AI Results ── */}
+      {suggestions && !loading && (() => {
+        const result = parseRecipes(suggestions)
+        if (result?.error) return (
+          <div className="alert alert-error" style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '15px' }}>
+            <span style={{ fontSize: '20px', flexShrink: 0 }}>🚫</span>
+            <span>{result.error}</span>
+          </div>
+        )
+        if (result?.recipes) return (
+          <div className="suggest-results">
+            <div className="suggest-results-header">
+              <h2>Here's what you can make</h2>
+              <p>{result.recipes.length} recipes based on your ingredients</p>
+            </div>
+            <div className="ai-recipe-grid">
+              {result.recipes.map((recipe, i) => (
+                <RecipeCard key={i} recipe={recipe} />
+              ))}
+            </div>
+          </div>
+        )
+        return (
+          <div className="alert alert-error" style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '15px' }}>
+            <span style={{ fontSize: '20px', flexShrink: 0 }}>🚫</span>
+            <span>Something went wrong. Please try again with valid food ingredients.</span>
+          </div>
+        )
+      })()}
+
+      {/* ── MealDB Results ── */}
       {(mealdbResults.length > 0 || mealdbLoading) && (
-        <div>
-          <h3 style={{ marginBottom: '12px', color: 'var(--primary-dark)' }}>
-            🍽️ Real Recipes from TheMealDB
-          </h3>
+        <div className="suggest-mealdb">
+          <div className="suggest-results-header">
+            <h2>More inspiration</h2>
+            <p>Popular recipes with similar ingredients from TheMealDB</p>
+          </div>
           {mealdbLoading ? (
             <div className="loading">Loading matching meals...</div>
           ) : (

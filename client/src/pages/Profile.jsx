@@ -2,53 +2,13 @@ import { useState, useContext } from 'react'
 import { AuthContext } from '../context/AuthContext'
 import api from '../services/api'
 
+const ALLERGY_OPTIONS = [
+  'peanuts', 'tree nuts', 'milk', 'eggs', 'wheat', 'soy',
+  'fish', 'shellfish', 'sesame', 'gluten', 'corn', 'mustard',
+  'celery', 'lupin', 'mollusks', 'sulfites'
+]
+
 const DIETARY_OPTIONS = ['vegan', 'vegetarian', 'halal', 'kosher', 'gluten-free', 'dairy-free', 'keto', 'paleo']
-
-const TagInput = ({ label, tags, onChange }) => {
-  const [input, setInput] = useState('')
-
-  const addTag = (value) => {
-    const tag = value.trim().toLowerCase()
-    if (tag && !tags.includes(tag)) onChange([...tags, tag])
-    setInput('')
-  }
-
-  const removeTag = (tag) => onChange(tags.filter(t => t !== tag))
-
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter' || e.key === ',') {
-      e.preventDefault()
-      addTag(input)
-    } else if (e.key === 'Backspace' && !input && tags.length > 0) {
-      removeTag(tags[tags.length - 1])
-    }
-  }
-
-  return (
-    <div className="form-group">
-      <label>{label}</label>
-      <div className="tag-input-area">
-        {tags.map(tag => (
-          <span key={tag} className="tag">
-            {tag}
-            <button type="button" onClick={() => removeTag(tag)}>×</button>
-          </span>
-        ))}
-        <input
-          className="tag-input"
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          onBlur={() => input && addTag(input)}
-          placeholder={tags.length === 0 ? 'Type and press Enter...' : ''}
-        />
-      </div>
-      <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>
-        Press Enter or comma to add
-      </p>
-    </div>
-  )
-}
 
 const Profile = () => {
   const { user, updateUser } = useContext(AuthContext)
@@ -102,7 +62,37 @@ const Profile = () => {
         )}
 
         <form onSubmit={handleSave}>
-          <TagInput label="Allergies" tags={allergies} onChange={setAllergies} />
+          <div className="form-group">
+            <label>Allergies</label>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '4px' }}>
+              {ALLERGY_OPTIONS.map(opt => (
+                <button
+                  key={opt}
+                  type="button"
+                  onClick={() => setAllergies(prev =>
+                    prev.includes(opt) ? prev.filter(a => a !== opt) : [...prev, opt]
+                  )}
+                  style={{
+                    cursor: 'pointer',
+                    border: 'none',
+                    padding: '6px 14px',
+                    borderRadius: '20px',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    background: allergies.includes(opt)
+                      ? 'rgba(229,62,62,0.15)'
+                      : 'var(--border)',
+                    color: allergies.includes(opt)
+                      ? '#e53e3e'
+                      : 'var(--text-muted)'
+                  }}
+                >
+                  {allergies.includes(opt) ? '✓ ' : ''}{opt}
+                </button>
+              ))}
+            </div>
+            <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Click to toggle</p>
+          </div>
 
           <div className="form-group">
             <label>Dietary Preferences</label>

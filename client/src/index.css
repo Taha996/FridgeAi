@@ -477,7 +477,494 @@ select.form-control {
 .pantry-item-info span { font-size: 13px; color: var(--text-muted); }
 .pantry-item-expiry { margin-left: 6px; }
 
-/* ── AI SUGGESTIONS ──────────────────────── */
+/* ── AI SUGGESTIONS PAGE ────────────────── */
+
+/* Input card */
+.suggest-input-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 0;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+.suggest-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+}
+
+.suggest-tab {
+  flex: 1;
+  padding: 14px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: color 0.2s, background 0.2s, box-shadow 0.2s;
+  position: relative;
+}
+
+.suggest-tab:hover {
+  background: rgba(82, 183, 136, 0.04);
+  color: var(--text);
+}
+
+.suggest-tab.active {
+  color: var(--primary-dark);
+  background: rgba(82, 183, 136, 0.06);
+  box-shadow: inset 0 -2.5px 0 var(--primary);
+}
+
+.suggest-tab-content {
+  padding: 20px 24px;
+}
+
+.suggest-hint {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.suggest-link {
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.suggest-link:hover {
+  text-decoration: underline;
+}
+
+.suggest-input-card .btn {
+  margin: 0 24px 20px;
+  width: calc(100% - 48px);
+}
+
+/* Loading state */
+.suggest-loading {
+  text-align: center;
+  padding: 56px 20px;
+}
+
+.suggest-loading-animation {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  font-size: 32px;
+  margin-bottom: 20px;
+}
+
+.suggest-loading-animation span {
+  animation: suggestBounce 1.2s ease-in-out infinite;
+}
+
+.suggest-loading-animation span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.suggest-loading-animation span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes suggestBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.suggest-loading-text {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.suggest-loading-sub {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* Empty state */
+.suggest-empty {
+  text-align: center;
+  padding: 56px 20px;
+  color: var(--text-muted);
+}
+
+.suggest-empty-icon {
+  font-size: 52px;
+  display: block;
+  margin-bottom: 16px;
+}
+
+.suggest-empty h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.suggest-empty p {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Results header */
+.suggest-results {
+  margin-bottom: 36px;
+}
+
+.suggest-results-header {
+  margin-bottom: 20px;
+}
+
+.suggest-results-header h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--primary-dark);
+  margin-bottom: 2px;
+}
+
+.suggest-results-header p {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.suggest-mealdb {
+  margin-top: 12px;
+  padding-top: 28px;
+  border-top: 1px solid var(--border);
+}
+
+/* Recipe cards */
+.ai-recipe-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.ai-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.ai-card:hover {
+  box-shadow: var(--shadow);
+  transform: translateY(-2px);
+}
+
+.ai-card-top {
+  padding: 22px 24px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.ai-card-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.ai-card-emoji {
+  font-size: 22px;
+}
+
+.ai-card-title h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--primary-dark);
+  margin: 0;
+}
+
+.ai-card-badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ai-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--border);
+  color: var(--text-muted);
+}
+
+.ai-badge-icon {
+  font-size: 13px;
+}
+
+.ai-card-section {
+  padding: 18px 24px 0;
+}
+
+.ai-card-section:last-of-type {
+  padding-bottom: 4px;
+}
+
+.ai-card-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+
+/* Ingredients */
+.ai-card-ingredients {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.ai-card-ingredients li {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  background: #f1f5f9;
+  color: var(--text-muted);
+  border: 1px solid transparent;
+}
+
+.ai-card-ingredients li.owned {
+  background: rgba(82, 183, 136, 0.12);
+  color: var(--primary-dark);
+  border-color: rgba(82, 183, 136, 0.25);
+}
+
+.ai-card-ingredients .ing-icon {
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.ai-card-legend {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 2px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  border: 1px solid var(--border);
+}
+
+.legend-dot.owned {
+  background: rgba(82, 183, 136, 0.3);
+  border-color: rgba(82, 183, 136, 0.5);
+}
+
+/* Steps */
+.ai-card-steps {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ai-card-steps li {
+  display: flex;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.65;
+  padding: 8px 0;
+  border-bottom: 1px solid #f7fafc;
+}
+
+.ai-card-steps li:last-child {
+  border-bottom: none;
+}
+
+.step-num {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+}
+
+/* Card footer / save */
+.ai-card-footer {
+  padding: 14px 24px 18px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.ai-saved-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  background: rgba(82, 183, 136, 0.15);
+  color: var(--primary-dark);
+}
+
+/* MealDB cards */
+.mealdb-card {
+  cursor: pointer;
+  padding: 0;
+  overflow: hidden;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.mealdb-card:hover {
+  box-shadow: var(--shadow);
+  transform: translateY(-2px);
+}
+
+.mealdb-card-img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+}
+
+.mealdb-card-body {
+  padding: 12px;
+}
+
+.mealdb-card-body h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary-dark);
+  margin-bottom: 6px;
+}
+
+.mealdb-card-body .badge {
+  font-size: 11px;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 16px;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  max-width: 640px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-img {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+  border-radius: 16px 16px 0 0;
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.modal-header h2 {
+  color: var(--primary-dark);
+  font-size: 20px;
+  font-weight: 700;
+  flex: 1;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--text-muted);
+  margin-left: 12px;
+  padding: 0;
+  line-height: 1;
+}
+
+.modal-close:hover {
+  color: var(--text);
+}
+
+.modal-section {
+  margin-bottom: 16px;
+}
+
+.modal-section h3 {
+  color: var(--primary-dark);
+  margin-bottom: 8px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.modal-ingredients {
+  padding-left: 18px;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+  line-height: 2;
+}
+
+.modal-instructions {
+  color: var(--text);
+  line-height: 1.8;
+  white-space: pre-wrap;
+  font-size: 14px;
+}
+
+/* Fallback raw AI response */
 .ai-response {
   background: white;
   border: 1px solid var(--border);
@@ -543,6 +1030,7 @@ select.form-control {
   font-family: inherit;
   color: var(--text);
   background: transparent;
+
 }
 
 /* ── RESPONSIVE ──────────────────────────── */
@@ -553,4 +1041,12 @@ select.form-control {
   .hero-section p { font-size: 16px; }
   .navbar-links a { padding: 6px 8px; font-size: 13px; }
   .auth-card { padding: 28px 20px; }
+
+  .suggest-tabs { flex-direction: column; }
+  .suggest-tab { text-align: left; }
+  .suggest-tab.active { box-shadow: inset 3px 0 0 var(--primary); }
+  .suggest-tab-content { padding: 16px; }
+  .suggest-input-card .btn { margin: 0 16px 16px; width: calc(100% - 32px); }
+  .ai-card-top, .ai-card-section, .ai-card-footer { padding-left: 16px; padding-right: 16px; }
+  .ai-card-legend { flex-direction: column; gap: 4px; }
 }
