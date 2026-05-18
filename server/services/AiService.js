@@ -38,7 +38,8 @@ Rules:
 - Output ONLY the JSON array. No other text.`
 
     const response = await axios.post(
-`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`      {
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      {
         system_instruction: {
           parts: [{
             text: 'You are a cooking assistant that ONLY answers questions about recipes, ingredients, cooking techniques, and food. If the user asks about anything unrelated to food or cooking, politely refuse. Always respect dietary restrictions and allergies.'
