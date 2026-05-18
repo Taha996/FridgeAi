@@ -1,5 +1,7 @@
 const PantryItem = require('../models/Pantry')
 
+const ALLOWED_UNITS = ['g', 'kg', 'l', 'pcs']
+
 const getPantry = async (req, res, next) => {
   try {
     const items = await PantryItem.find({ user: req.user.id }).sort({ name: 1 })
@@ -12,6 +14,9 @@ const getPantry = async (req, res, next) => {
 const addItem = async (req, res, next) => {
   try {
     const { name, quantity, unit, category, expiryDate } = req.body
+    if (unit && !ALLOWED_UNITS.includes(unit)) {
+      return res.status(400).json({ message: `Unit must be one of: ${ALLOWED_UNITS.join(', ')}` })
+    }
     const item = await PantryItem.create({
       user: req.user.id,
       name,
@@ -28,6 +33,9 @@ const addItem = async (req, res, next) => {
 
 const updateItem = async (req, res, next) => {
   try {
+    if (req.body.unit && !ALLOWED_UNITS.includes(req.body.unit)) {
+      return res.status(400).json({ message: `Unit must be one of: ${ALLOWED_UNITS.join(', ')}` })
+    }
     const item = await PantryItem.findOneAndUpdate(
       { _id: req.params.id, user: req.user.id },
       req.body,

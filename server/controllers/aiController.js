@@ -1,4 +1,4 @@
-const { suggestRecipes } = require('../services/claudeService')
+const { suggestRecipes } = require('../services/AiService')
 const PantryItem = require('../models/Pantry')
 const User = require('../models/User')
 

@@ -1,17 +1,15 @@
 const mongoose = require('mongoose')
 
-// A Schema defines the SHAPE of your data in MongoDB
-// Think of it like a form with required fields
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    trim: true           // removes extra spaces
+    trim: true
   },
   email: {
     type: String,
     required: true,
-    unique: true,        // no two users with same email
+    unique: true,
     lowercase: true
   },
   password: {
@@ -20,16 +18,15 @@ const userSchema = new mongoose.Schema({
     minlength: 6
   },
   allergies: {
-    type: [String],      // array of strings e.g. ["gluten", "nuts"]
+    type: [String],
     default: []
   },
   dietaryPreferences: {
-    type: [String],      // e.g. ["vegan", "halal"]
+    type: [String],
     default: []
   }
 }, {
-  timestamps: true       // adds createdAt and updatedAt automatically
+  timestamps: true
 })
 
-// Export the model so we can use it in controllers
 module.exports = mongoose.model('User', userSchema)

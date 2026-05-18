@@ -17,6 +17,7 @@ const pantryItemSchema = new mongoose.Schema({
   },
   unit: {
     type: String,
+    enum: ['g', 'kg', 'l', 'pcs'],
     default: 'pcs'
   },
   category: {

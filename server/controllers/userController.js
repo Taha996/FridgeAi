@@ -84,9 +84,40 @@ const getProfile = async (req, res) => {
   }
 }
 
+const VALID_ALLERGIES = [
+  'peanuts', 'tree nuts', 'milk', 'eggs', 'wheat', 'soy',
+  'fish', 'shellfish', 'sesame', 'gluten', 'corn', 'mustard',
+  'celery', 'lupin', 'mollusks', 'sulfites'
+]
+
+const VALID_DIETARY = [
+  'vegan', 'vegetarian', 'halal', 'kosher', 'gluten-free', 'dairy-free', 'keto', 'paleo'
+]
+
 const updateProfile = async (req, res) => {
   try {
     const { name, allergies, dietaryPreferences } = req.body
+
+    if (allergies !== undefined) {
+      if (!Array.isArray(allergies)) {
+        return res.status(400).json({ message: 'Allergies must be an array' })
+      }
+      const invalid = allergies.filter(a => !VALID_ALLERGIES.includes(a))
+      if (invalid.length > 0) {
+        return res.status(400).json({ message: `Invalid allergies: ${invalid.join(', ')}` })
+      }
+    }
+
+    if (dietaryPreferences !== undefined) {
+      if (!Array.isArray(dietaryPreferences)) {
+        return res.status(400).json({ message: 'Dietary preferences must be an array' })
+      }
+      const invalid = dietaryPreferences.filter(p => !VALID_DIETARY.includes(p))
+      if (invalid.length > 0) {
+        return res.status(400).json({ message: `Invalid dietary preferences: ${invalid.join(', ')}` })
+      }
+    }
+
     const user = await User.findByIdAndUpdate(
       req.user.id,
       { name, allergies, dietaryPreferences },
