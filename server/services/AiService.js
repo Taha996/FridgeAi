@@ -38,31 +38,27 @@ Rules:
 - Output ONLY the JSON array. No other text.`
 
     const response = await axios.post(
-      'https://api.groq.com/openai/v1/chat/completions',
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
       {
-        model: 'llama-3.3-70b-versatile',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a cooking assistant that ONLY answers questions about recipes, ingredients, cooking techniques, and food. If the user asks about anything unrelated to food or cooking, politely refuse and remind them you can only help with recipes and ingredients. Always respect dietary restrictions and allergies.'
-          },
-          { role: 'user', content: prompt }
-        ],
-        max_tokens: 2000
+        system_instruction: {
+          parts: [{
+            text: 'You are a cooking assistant that ONLY answers questions about recipes, ingredients, cooking techniques, and food. If the user asks about anything unrelated to food or cooking, politely refuse. Always respect dietary restrictions and allergies.'
+          }]
+        },
+        contents: [{
+          parts: [{ text: prompt }]
+        }]
       },
       {
-        headers: {
-          Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
-          'Content-Type': 'application/json'
-        }
+        headers: { 'Content-Type': 'application/json' }
       }
     )
 
-    return response.data.choices[0].message.content
+    return response.data.candidates[0].content.parts[0].text
 
   } catch (error) {
-    console.error('Groq error status:', error.response?.status)
-    console.error('Groq error data:', JSON.stringify(error.response?.data))
+    console.error('Gemini error status:', error.response?.status)
+    console.error('Gemini error data:', JSON.stringify(error.response?.data))
     throw error
   }
 }
