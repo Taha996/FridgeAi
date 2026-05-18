@@ -40,6 +40,7 @@ Rules:
     const response = await axios.post(
       `https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/ai/run/@cf/meta/llama-3.3-70b-instruct-fp8-fast`,
       {
+        max_tokens:2000,
         messages: [
           {
             role: 'system',
