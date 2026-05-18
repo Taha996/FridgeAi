@@ -38,27 +38,32 @@ Rules:
 - Output ONLY the JSON array. No other text.`
 
     const response = await axios.post(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      `https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/ai/run/@cf/meta/llama-3.3-70b-instruct-fp8-fast`,
       {
-        system_instruction: {
-          parts: [{
-            text: 'You are a cooking assistant that ONLY answers questions about recipes, ingredients, cooking techniques, and food. If the user asks about anything unrelated to food or cooking, politely refuse. Always respect dietary restrictions and allergies.'
-          }]
-        },
-        contents: [{
-          parts: [{ text: prompt }]
-        }]
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a cooking assistant that ONLY answers questions about recipes, ingredients, cooking techniques, and food. If the user asks about anything unrelated to food or cooking, politely refuse. Always respect dietary restrictions and allergies.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ]
       },
       {
-        headers: { 'Content-Type': 'application/json' }
+        headers: {
+          Authorization: `Bearer ${process.env.CLOUDFLARE_API_TOKEN}`,
+          'Content-Type': 'application/json'
+        }
       }
     )
 
-    return response.data.candidates[0].content.parts[0].text
+    return response.data.result.response
 
   } catch (error) {
-    console.error('Gemini error status:', error.response?.status)
-    console.error('Gemini error data:', JSON.stringify(error.response?.data))
+    console.error('Cloudflare AI error status:', error.response?.status)
+    console.error('Cloudflare AI error data:', JSON.stringify(error.response?.data))
     throw error
   }
 }
