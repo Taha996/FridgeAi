@@ -195,7 +195,7 @@ const AIsuggestions = () => {
         ingredientsForMealDB = ingredients.slice(0, 3)
       }
 
-      setSuggestions(res.data.suggestions)
+     setSuggestions(JSON.stringify(res.data.suggestions))
 
       if (ingredientsForMealDB.length > 0) {
         setMealdbLoading(true)
